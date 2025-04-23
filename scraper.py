@@ -13,15 +13,22 @@ def parse_fighter(url):
         el = soup.select_one(css_selector)
         return el.text.strip() if el else ""
 
+    def get_next_td(label):
+        label_td = soup.find("td", string=label)
+        return label_td.find_next_sibling("td").text.strip() if label_td else ""
+
+    name = get_text("h1[itemprop='name'] span.fn") or get_text("h1 span.fn")
+    nickname = get_text("span.nickname em")
+
     data = {
-        "name": get_text("span.fn[itemprop='name']"),
-        "nickname": get_text("span[itemprop='alternateName']").replace('"', ''),
-        "age": get_text("div.fighter-data td:contains('AGE') + td"),
+        "name": name,
+        "nickname": nickname,
+        "age": get_next_td("AGE"),
         "birthdate": get_text("span[itemprop='birthDate']"),
-        "height": get_text("div.fighter-data td:contains('HEIGHT') + td"),
-        "weight": get_text("div.fighter-data td:contains('WEIGHT') + td"),
+        "height": get_next_td("HEIGHT"),
+        "weight": get_next_td("WEIGHT"),
         "association": get_text("div.association-class"),
-        "weight_class": get_text("div.fighter-data td:contains('CLASS') + td"),
+        "weight_class": get_next_td("CLASS"),
         "wins": get_text("div.winsloses-holder .wins .pl"),
         "losses": get_text("div.winsloses-holder .losses .pl")
     }
